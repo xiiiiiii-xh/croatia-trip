@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>克罗地亚 & 斯洛文尼亚自驾之旅 | 旅行攻略与行程汇总</title>
+    <title>克罗地亚 & 斯洛文尼亚自驾之旅</title>
     <style>
         :root {
             --primary-color: #0055a5;
@@ -33,51 +33,69 @@
 
         header {
             text-align: center;
-            padding: 20px 0;
-            margin-bottom: 15px;
+            padding: 15px 0 10px 0;
         }
 
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             color: var(--primary-color);
-            margin-bottom: 5px;
         }
 
-        header p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        /* 快捷入口链接栏 */
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .btn-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* 路线地图卡片与图片容器 */
+        .route-map-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 10px 12px;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .route-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .map-image-box {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
+            background: #eef2f7;
+        }
+
+        .map-image-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .map-btn {
+            display: block;
+            text-align: center;
+            background: #eef6fc;
+            color: var(--primary-color);
+            padding: 10px;
             border-radius: 8px;
             text-decoration: none;
-            color: var(--primary-color);
             font-weight: 600;
-            font-size: 0.85rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            font-size: 0.88rem;
+            border: 1px solid #cce3f6;
             transition: all 0.2s;
         }
 
-        .btn-link:hover {
-            background-color: #eef6fc;
-            border-color: var(--accent-color);
+        .map-btn:hover {
+            background: var(--primary-color);
+            color: #ffffff;
         }
 
-        /* 卡片折叠效果 */
+        /* 折叠卡片通用样式 */
         .day-card {
             background: var(--card-bg);
             border-radius: 10px;
@@ -168,7 +186,18 @@
             text-decoration: underline;
         }
 
-        /* 顶部控制按钮 */
+        /* 取车预留信息框 */
+        .placeholder-box {
+            background: #fff;
+            border: 1px dashed #b0c4de;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        /* 控制按钮 */
         .controls {
             display: flex;
             justify-content: flex-end;
@@ -188,16 +217,24 @@
 <body>
 
     <header>
-        <h1>🇭🇷&🇸🇮 2026 亚得里亚海自驾之旅</h1>
-        <p>10月1日 - 10月10日 | 实用链接 & 每日行程汇总</p>
+        <h1>🇭🇷 & 🇸🇮 2026 亚得里亚海自驾之旅</h1>
     </header>
 
-    <!-- 常用官方/工具链接入口 -->
-    <div class="quick-links">
-        <a href="https://www.croatiaairlines.com/check-in" target="_blank" class="btn-link">✈️ 克罗地亚航空选座</a>
-        <a href="https://evinjeta.dars.si/" target="_blank" class="btn-link">🚗 斯洛文尼亚电子高速票</a>
-        <a href="https://www.getyourguide.com" target="_blank" class="btn-link">🎟️ GetYourGuide 预订</a>
-        <a href="https://www.viator.com" target="_blank" class="btn-link">⛵ Viator 项目预订</a>
+    <!-- 顶部加粗路线地图展示区 -->
+    <div class="route-map-container">
+        <div class="route-badge">
+            <span>🗺️ 全程自驾路线高亮图</span>
+            <span>全程约 950 km</span>
+        </div>
+        
+        <!-- 加粗干线地图图片 -->
+        <div class="map-image-box">
+            <img src="https://quickchart.io/chart?c={type:%27line%27,data:{labels:[%27萨格勒布%27,%27卢布尔雅那%27,%27布莱德湖%27,%27扎达尔%27,%27斯普利特%27,%27斯通%27,%27杜布罗夫尼克%27],datasets:[{label:%27自驾主路线(km)%27,data:[0,140,195,540,698,880,940],borderColor:%27%230055a5%27,borderWidth:5,fill:false,pointBackgroundColor:%27%23ff4d4f%27,pointRadius:7}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false}}}}" alt="自驾路线里程示意图">
+        </div>
+
+        <a href="https://www.google.com/maps/dir/Zagreb+Airport,+Zagreb/Ljubljana/Bled/Zadar/Split/Dubrovnik" target="_blank" class="map-btn">
+            📍 打开 Google Maps 实时导航路线
+        </a>
     </div>
 
     <!-- 展开/折叠控制 -->
@@ -235,6 +272,18 @@
                 <span class="info-label">📌 核心行程：</span>
                 09:55 抵达萨格勒布机场取车 → 萨格勒布老城漫步（圣马可教堂、耶拉契奇广场） → 自驾过境至斯洛文尼亚 → 卢布尔雅那老城游览（龙桥、三重桥）
             </div>
+
+            <!-- 取车信息预留区 -->
+            <div class="info-group">
+                <span class="info-label">🚘 租车与取车信息：</span>
+                <div class="placeholder-box">
+                    租车公司：[待补充，例如 Hertz / SIXT]<br>
+                    订单编号：[待补充]<br>
+                    取车地点：萨格勒布机场 (ZAG) 柜台<br>
+                    注意事项：确认跨国通行费/过境卡 (Cross-Border Card)
+                </div>
+            </div>
+
             <div class="info-group">
                 <span class="info-label">🏨 住宿与定位：</span>
                 <a href="https://maps.app.goo.gl/9Fc8XqNLQPHRuhmMA" target="_blank" class="link-tag">📍 卢布尔雅那住宿 (Google Maps)</a>
@@ -244,8 +293,9 @@
                 <a href="https://evinjeta.dars.si/" target="_blank" class="link-tag">🎫 购买斯洛文尼亚 e-Vignette 高速票</a>
             </div>
             <div class="info-group">
-                <span class="info-label">🌦 当地天气：</span>
-                <a href="https://weather.apple.com/search?q=Ljubljana" target="_blank" class="link-tag">查 卢布尔雅那 天气</a>
+                <span class="info-label">🌦 当地与实况天气：</span>
+                <a href="https://www.accuweather.com/en/search-locations" target="_blank" class="link-tag">📍 当前 IP 位置实况天气</a>
+                <a href="https://www.accuweather.com/en/si/ljubljana/300152/weather-forecast/300152" target="_blank" class="link-tag">🌦 卢布尔雅那天气</a>
             </div>
         </div>
     </div>
@@ -272,8 +322,8 @@
             </div>
             <div class="info-group">
                 <span class="info-label">🌦 当地天气：</span>
-                <a href="https://weather.apple.com/search?q=Bled" target="_blank" class="link-tag">查 布莱德湖 天气</a>
-                <a href="https://weather.apple.com/search?q=Zadar" target="_blank" class="link-tag">查 扎达尔 天气</a>
+                <a href="https://www.accuweather.com/en/si/bled/300127/weather-forecast/300127" target="_blank" class="link-tag">查 布莱德湖 天气</a>
+                <a href="https://www.accuweather.com/en/hr/zadar/118878/weather-forecast/118878" target="_blank" class="link-tag">查 扎达尔 天气</a>
             </div>
         </div>
     </div>
@@ -296,7 +346,7 @@
             </div>
             <div class="info-group">
                 <span class="info-label">🌦 当地天气：</span>
-                <a href="https://weather.apple.com/search?q=Split" target="_blank" class="link-tag">查 斯普利特 天气</a>
+                <a href="https://www.accuweather.com/en/hr/split/118330/weather-forecast/118330" target="_blank" class="link-tag">查 斯普利特 天气</a>
             </div>
         </div>
     </div>
@@ -320,7 +370,7 @@
             </div>
             <div class="info-group">
                 <span class="info-label">🌦 当地天气：</span>
-                <a href="https://weather.apple.com/search?q=Hvar" target="_blank" class="link-tag">查 赫瓦尔岛 天气</a>
+                <a href="https://www.accuweather.com/en/hr/hvar/116262/weather-forecast/116262" target="_blank" class="link-tag">查 赫瓦尔岛 天气</a>
             </div>
         </div>
     </div>
@@ -343,7 +393,7 @@
             </div>
             <div class="info-group">
                 <span class="info-label">🌦 当地天气：</span>
-                <a href="https://weather.apple.com/search?q=Dubrovnik" target="_blank" class="link-tag">查 杜布罗夫尼克 天气</a>
+                <a href="https://www.accuweather.com/en/hr/dubrovnik/117910/weather-forecast/117910" target="_blank" class="link-tag">查 杜布罗夫尼克 天气</a>
             </div>
         </div>
     </div>
@@ -367,7 +417,7 @@
             </div>
             <div class="info-group">
                 <span class="info-label">🌦 当地天气：</span>
-                <a href="https://weather.apple.com/search?q=Dubrovnik" target="_blank" class="link-tag">查 杜布罗夫尼克 天气</a>
+                <a href="https://www.accuweather.com/en/hr/dubrovnik/117910/weather-forecast/117910" target="_blank" class="link-tag">查 杜布罗夫尼克 天气</a>
             </div>
         </div>
     </div>
@@ -408,15 +458,12 @@
         </div>
     </div>
 
-    <!-- 简单交互 JavaScript -->
     <script>
-        // 单张卡片展开/折叠
         function toggleCard(headerElement) {
             const card = headerElement.parentElement;
             card.classList.toggle('open');
         }
 
-        // 全部展开 / 全部折叠
         function toggleAll(open) {
             const cards = document.querySelectorAll('.day-card');
             cards.forEach(card => {
@@ -428,7 +475,6 @@
             });
         }
         
-        // 默认展开 Day 1 方便查看
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll('.day-card')[1].classList.add('open');
         });
