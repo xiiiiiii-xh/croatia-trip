@@ -41,7 +41,7 @@
             color: var(--primary-color);
         }
 
-        /* 路线地图卡片与图片容器 */
+        /* 路线地图容器 */
         .route-map-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -49,31 +49,15 @@
             padding: 12px;
             margin-bottom: 20px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            text-align: center;
         }
 
-        .route-badge {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.88rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .map-image-box {
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            border: 1px solid #e0e0e0;
-            background: #eef2f7;
-        }
-
-        .map-image-box img {
+        .custom-map-img {
             width: 100%;
             height: auto;
+            border-radius: 8px;
             display: block;
+            margin-bottom: 10px;
         }
 
         .map-btn {
@@ -95,7 +79,7 @@
             color: #ffffff;
         }
 
-        /* 折叠卡片通用样式 */
+        /* 卡片样式 */
         .day-card {
             background: var(--card-bg);
             border-radius: 10px;
@@ -186,7 +170,6 @@
             text-decoration: underline;
         }
 
-        /* 取车预留信息框 */
         .placeholder-box {
             background: #fff;
             border: 1px dashed #b0c4de;
@@ -197,7 +180,17 @@
             margin-top: 4px;
         }
 
-        /* 控制按钮 */
+        .spot-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 4px;
+        }
+
+        .spot-list li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
         .controls {
             display: flex;
             justify-content: flex-end;
@@ -220,20 +213,11 @@
         <h1>🇭🇷 & 🇸🇮 2026 亚得里亚海自驾之旅</h1>
     </header>
 
-    <!-- 顶部加粗路线地图展示区 -->
+    <!-- 自驾线路整体地图入口：将自定义图片放到和 index.html 同级目录下，命名为 route_map.png -->
     <div class="route-map-container">
-        <div class="route-badge">
-            <span>🗺️ 全程自驾路线高亮图</span>
-            <span>全程约 950 km</span>
-        </div>
-        
-        <!-- 加粗干线地图图片 -->
-        <div class="map-image-box">
-            <img src="https://quickchart.io/chart?c={type:%27line%27,data:{labels:[%27萨格勒布%27,%27卢布尔雅那%27,%27布莱德湖%27,%27扎达尔%27,%27斯普利特%27,%27斯通%27,%27杜布罗夫尼克%27],datasets:[{label:%27自驾主路线(km)%27,data:[0,140,195,540,698,880,940],borderColor:%27%230055a5%27,borderWidth:5,fill:false,pointBackgroundColor:%27%23ff4d4f%27,pointRadius:7}]},options:{plugins:{legend:{display:false}},scales:{y:{display:false}}}}" alt="自驾路线里程示意图">
-        </div>
-
+        <img src="route_map.png" alt="自驾路线图" class="custom-map-img">
         <a href="https://www.google.com/maps/dir/Zagreb+Airport,+Zagreb/Ljubljana/Bled/Zadar/Split/Dubrovnik" target="_blank" class="map-btn">
-            📍 打开 Google Maps 实时导航路线
+            📍 在 Google Maps 中打开完整路线地图
         </a>
     </div>
 
@@ -255,7 +239,7 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                18:50 上海浦东 T2 ✈ CA1836 ✈ 21:25 北京首都 T3 (转机)
+                18:50 上海浦东 T2 ✈ CA1836 ✈ 21:25 北京首都 T3
             </div>
         </div>
     </div>
@@ -270,10 +254,33 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                09:55 抵达萨格勒布机场取车 → 萨格勒布老城漫步（圣马可教堂、耶拉契奇广场） → 自驾过境至斯洛文尼亚 → 卢布尔雅那老城游览（龙桥、三重桥）
+                09:55 抵达萨格勒布机场取车 → 萨格勒布老城漫步 → 自驾过境至斯洛文尼亚 → 卢布尔雅那老城游览
             </div>
 
-            <!-- 取车信息预留区 -->
+            <div class="info-group">
+                <span class="info-label">🏛️ Zagreb 推荐打卡点：</span>
+                圣马可教堂 → 警示塔 → Funicular缆车 → 石门 → KRAVATA领带店 → Dolac Market → 札格瑞布大教堂 → 耶拉西奇广场 → 歌剧院
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">📷 卢布尔雅那主要景点：</span>
+                <ul class="spot-list">
+                    <li>1️⃣ <strong>卢布尔雅那城堡 Ljubljana Castle</strong>：山脚下老城搭缆车 Funicular，或者徒步石阶路15分钟上山。我们是开车，有收费停车场2欧。门票：全馆通票19欧，网线上购票17.5欧。开放（5-9月）：9:00-22:00。<a href="https://www.ljubljanskigrad.si/en/" target="_blank" class="link-tag">官网</a></li>
+                    <li>2️⃣ <strong>普列舍伦广场 Preseren Square</strong>：老城起点，广场中央矗立诗人普列舍伦雕像，粉色的报喜教堂为视觉中心。</li>
+                    <li>3️⃣ <strong>三重桥 Triple Bridge | UNESCO普列奇尼克建筑遗产</strong>：一主两副三座石桥，建筑师 Plecnik 的代表作，连接广场与老城河岸，两侧滨河拱廊回看桥梁全景。</li>
+                    <li>4️⃣ <strong>Cobblers' Bridge</strong>：挂满情侣锁的石砌步行桥，是拍摄河道两岸红屋顶绝佳机位。</li>
+                    <li>5️⃣ <strong>Dragon Bridge飞龙桥</strong>：城市的标志，桥头四座青铜飞龙。</li>
+                    <li>6️⃣ <strong>中央农贸市场 Central Market</strong>：由普列奇尼克设计的拱廊市集。营业时间：周二-周六 07:00-14:00。</li>
+                    <li>7️⃣ <strong>市政厅 Mestni trg</strong>：巴洛克市政厅建筑，广场设有三座喷泉。</li>
+                    <li>8️⃣ <strong>蒂沃利公园 Tivoli Park</strong>：城市免费森林公园，从普列舍伦广场步行约7分钟即达，登上Roznik 小山，俯瞰整座城市。</li>
+                </ul>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">🍽️ 推荐餐厅合集：</span>
+                <a href="https://maps.app.goo.gl/pY7GcyB6QfbDZ7dr9" target="_blank" class="link-tag">🍴 谷歌地图美食品鉴清单 (Google Maps)</a>
+            </div>
+
             <div class="info-group">
                 <span class="info-label">🚘 租车与取车信息：</span>
                 <div class="placeholder-box">
@@ -310,7 +317,7 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                驱车至布莱德湖（登 Osojnica 观景台 + 划船登岛 + 城堡观景） → 南下经过十六湖外围 → 抵达扎达尔看海风琴 &“向太阳致敬”日落（日落时间约 18:40）
+                驱车至布莱德湖 → 南下经过十六湖外围 → 抵达扎达尔看海风琴 &“向太阳致敬”日落
             </div>
             <div class="info-group">
                 <span class="info-label">🏨 住宿与定位：</span>
@@ -338,7 +345,7 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                上午游览扎达尔老城（罗马广场、圣多纳图斯教堂） → 下午沿景观 D8 公路前往斯普利特 → 傍晚漫步戴克里先宫
+                上午游览扎达尔老城 → 下午沿景观 D8 公路前往斯普利特 → 傍晚漫步戴克里先宫
             </div>
             <div class="info-group">
                 <span class="info-label">🏨 住宿与定位：</span>
@@ -361,7 +368,7 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                全天快艇出海：毕舍沃岛 (Biševo 蓝洞) → 维斯岛 (Vis) → 斯蒂尼瓦海湾 → 赫瓦尔镇 (Hvar)
+                全天快艇出海：毕舍沃岛 → 维斯岛 → 斯蒂尼瓦海湾 → 赫瓦尔镇
             </div>
             <div class="info-group">
                 <span class="info-label">🔗 预订平台链接：</span>
@@ -385,7 +392,7 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                沿 D8 海岸公路自驾 → 途经小镇斯通 (Ston) 品尝生蚝 → 抵达杜布罗夫尼克机场还车 → 傍晚海边日落皮划艇
+                沿 D8 海岸公路自驾 → 途经小镇斯通品尝生蚝 → 抵达杜布罗夫尼克机场还车 → 傍晚海边日落皮划艇
             </div>
             <div class="info-group">
                 <span class="info-label">🏨 住宿与定位：</span>
@@ -408,7 +415,7 @@
         <div class="day-body">
             <div class="info-group">
                 <span class="info-label">📌 核心行程：</span>
-                网红 Brunch → 游览中世纪古城墙 & 《权力的游戏》打卡点 → 乘坐缆车/空中脚踏车登顶 Srd 山俯瞰全景
+                网红 Brunch → 游览中世纪古城墙 & 打卡点 → 乘坐缆车/空中脚踏车登顶 Srd 山俯瞰全景
             </div>
             <div class="info-group">
                 <span class="info-label">🔗 门票与体验预订：</span>
@@ -452,7 +459,7 @@
             <div class="info-group">
                 <span class="info-label">📌 航班衔接：</span>
                 · 10/9 06:15–07:10: 杜城 ✈ OU661 ✈ 萨格勒布<br>
-                · 10/9 11:55: 萨格勒布 T1 ✈ CA914 ✈ 北京首都 (+1天 08:05)<br>
+                · 10/9 11:55: 萨格勒布 T1 ✈ CA914 ✈ 北京首都<br>
                 · 10/10 10:30–12:40: 北京首都 ✈ CA1531 ✈ 上海虹桥 T2
             </div>
         </div>
