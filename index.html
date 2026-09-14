@@ -1,481 +1,912 @@
-<!DOCTYPE html>
+# Generate the complete single-file HTML travel itinerary with embedded zero-dependency inline JS/CSS.
+# We will save it to index.html and also test/verify its logic.
+
+html_content = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>克罗地亚 & 斯洛文尼亚自驾之旅</title>
-    <style>
-        :root {
-            --primary-color: #0055a5;
-            --accent-color: #0088cc;
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --border-color: #e5e9f2;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>克罗地亚 & 斯洛文尼亚自驾之旅 2026</title>
+  <style>
+    /* --------------------------------------------------------------------------
+       CSS Variables & Theme Setup (Auto Dark / Light Mode)
+       -------------------------------------------------------------------------- */
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --accent: #d97706;
+      --border-color: #e2e8f0;
+      --tag-bg: #f1f5f9;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      --map-bg: #f1f5f9;
+      --map-stroke: #94a3b8;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #0f172a;
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #3b82f6;
+        --primary-light: #1e3a8a33;
+        --accent: #f59e0b;
+        --border-color: #334155;
+        --tag-bg: #334155;
+        --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+        --map-bg: #1e293b;
+        --map-stroke: #475569;
+      }
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 15px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-        header {
-            text-align: center;
-            padding: 15px 0 10px 0;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-bottom: 60px;
+      line-height: 1.5;
+    }
 
-        header h1 {
-            font-size: 1.6rem;
-            color: var(--primary-color);
-        }
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-        /* 路线地图容器 */
-        .route-map-container {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            text-align: center;
-        }
+    h1, h2, h3 {
+      font-weight: 700;
+    }
 
-        .custom-map-img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            display: block;
-            margin-bottom: 10px;
-        }
+    .section-title {
+      font-size: 1.25rem;
+      margin: 28px 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+    }
 
-        .map-btn {
-            display: block;
-            text-align: center;
-            background: #eef6fc;
-            color: var(--primary-color);
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.88rem;
-            border: 1px solid #cce3f6;
-            transition: all 0.2s;
-        }
+    /* --------------------------------------------------------------------------
+       1. Hero Card & Live Countdown
+       -------------------------------------------------------------------------- */
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary), #1d4ed8);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.4);
+      margin-bottom: 24px;
+    }
 
-        .map-btn:hover {
-            background: var(--primary-color);
-            color: #ffffff;
-        }
+    .hero-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
 
-        /* 卡片样式 */
-        .day-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-        }
+    .hero-event {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      line-height: 1.3;
+    }
 
-        .day-header {
-            padding: 15px;
-            background: #fff;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-        }
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      padding: 12px;
+      border-radius: 12px;
+    }
 
-        .day-header:hover {
-            background-color: #fcfdfe;
-        }
+    .countdown-number {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: monospace;
+    }
 
-        .day-title {
-            font-weight: bold;
-            font-size: 1rem;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .countdown-unit {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
 
-        .day-location {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            background: #eef2f7;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
+    .tz-notice {
+      font-size: 0.75rem;
+      margin-top: 10px;
+      opacity: 0.8;
+      text-align: right;
+    }
 
-        .toggle-icon {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            transition: transform 0.3s;
-        }
+    /* --------------------------------------------------------------------------
+       2. SVG Hand-drawn Map Overview
+       -------------------------------------------------------------------------- */
+    .map-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
 
-        .day-card.open .toggle-icon {
-            transform: rotate(180deg);
-        }
+    .map-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: var(--map-bg);
+      border-radius: 12px;
+    }
 
-        .day-body {
-            display: none;
-            padding: 15px;
-            border-top: 1px solid var(--border-color);
-            background: #fafbfc;
-            font-size: 0.9rem;
-        }
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 0.78rem;
+    }
 
-        .day-card.open .day-body {
-            display: block;
-        }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-        .info-group {
-            margin-bottom: 12px;
-        }
+    .legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
 
-        .info-group:last-child {
-            margin-bottom: 0;
-        }
+    /* --------------------------------------------------------------------------
+       3. Booked Confirmations Card
+       -------------------------------------------------------------------------- */
+    .booking-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-        .info-label {
-            font-weight: 600;
-            color: #444;
-            margin-bottom: 4px;
-            display: block;
-        }
+    .booking-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
 
-        .link-tag {
-            display: inline-block;
-            margin-right: 8px;
-            margin-top: 4px;
-            color: var(--accent-color);
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
+    .booking-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
 
-        .link-tag:hover {
-            text-decoration: underline;
-        }
+    .booking-tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
 
-        .placeholder-box {
-            background: #fff;
-            border: 1px dashed #b0c4de;
-            padding: 8px 12px;
-            border-radius: 6px;
-            color: #666;
-            font-size: 0.85rem;
-            margin-top: 4px;
-        }
+    .booking-title {
+      font-weight: 700;
+      font-size: 1rem;
+    }
 
-        .spot-list {
-            list-style: none;
-            padding-left: 0;
-            margin-top: 4px;
-        }
+    .booking-detail {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
 
-        .spot-list li {
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
+    .map-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      font-weight: 500;
+    }
 
-        .controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
+    /* --------------------------------------------------------------------------
+       4. Daily Itinerary (Timeline & Nav Accordions)
+       -------------------------------------------------------------------------- */
+    .day-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
 
-        .ctrl-btn {
-            background: none;
-            border: none;
-            color: var(--accent-color);
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-    </style>
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .day-badge {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .day-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .btn-nav-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 10px;
+    }
+
+    .timeline {
+      margin-top: 14px;
+      position: relative;
+      padding-left: 20px;
+      border-left: 2px solid var(--border-color);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -26px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .timeline-time {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .timeline-content {
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
+
+    .badge-booking-required {
+      display: inline-block;
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 0.72rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .badge-booking-required {
+        background: #78350f;
+        color: #fef3c7;
+      }
+    }
+
+    .location-btn {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px dashed var(--primary);
+    }
+
+    /* --------------------------------------------------------------------------
+       5. Todo List (Pure List)
+       -------------------------------------------------------------------------- */
+    .todo-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+
+    .todo-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .todo-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .todo-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* --------------------------------------------------------------------------
+       6. Practical Tips
+       -------------------------------------------------------------------------- */
+    .tip-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    .tip-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .tip-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <h1>🇭🇷 & 🇸🇮 2026 亚得里亚海自驾之旅</h1>
-    </header>
+  <div class="container">
 
-    <!-- 自驾线路整体地图入口：将自定义图片放到和 index.html 同级目录下，命名为 route_map.png -->
-    <div class="route-map-container">
-        <img src="route_map.png" alt="自驾路线图" class="custom-map-img">
-        <a href="https://www.google.com/maps/dir/Zagreb+Airport,+Zagreb/Ljubljana/Bled/Zadar/Split/Dubrovnik" target="_blank" class="map-btn">
-            📍 在 Google Maps 中打开完整路线地图
-        </a>
+    <!-- 1. 顶部「此刻关注」卡片 -->
+    <div class="hero-card">
+      <div class="hero-label">此刻关注 · NEXT EVENT</div>
+      <div class="hero-event" id="hero-event">计算中...</div>
+      <div class="countdown-grid">
+        <div>
+          <div class="countdown-number" id="cd-days">00</div>
+          <div class="countdown-unit">天 DAYS</div>
+        </div>
+        <div>
+          <div class="countdown-number" id="cd-hours">00</div>
+          <div class="countdown-unit">时 HRS</div>
+        </div>
+        <div>
+          <div class="countdown-number" id="cd-mins">00</div>
+          <div class="countdown-unit">分 MINS</div>
+        </div>
+        <div>
+          <div class="countdown-number" id="cd-secs">00</div>
+          <div class="countdown-unit">秒 SECS</div>
+        </div>
+      </div>
+      <div class="tz-notice" id="tz-notice">自动适配当地时区</div>
     </div>
 
-    <!-- 展开/折叠控制 -->
-    <div class="controls">
-        <button class="ctrl-btn" onclick="toggleAll(true)">全部展开</button>
-        <button class="ctrl-btn" onclick="toggleAll(false)">全部折叠</button>
+    <!-- 2. 行程总览地图 (SVG 手绘感) -->
+    <div class="section-title">🗺️ 行程路线总览</div>
+    <div class="map-card">
+      <svg class="map-svg" viewBox="0 0 500 480" xmlns="http://www.w3.org/2000/svg">
+        <!-- 路线虚线 -->
+        <!-- PVG -> PEK -> ZAG -->
+        <path d="M 430 430 L 380 380 L 150 90" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+        
+        <!-- 自驾路线 -->
+        <!-- ZAG (150,90) -> Bled (60,40) -> Ljubljana (90,80) -> Zadar (160,240) -> Split (240,320) -> Ston (340,400) -> Dubrovnik (390,430) -->
+        <!-- Day 1: ZAG to Ljubljana -->
+        <path d="M 150 90 L 90 80" fill="none" stroke="#ef4444" stroke-width="3"/>
+        <!-- Day 2: Ljubljana -> Bled -> Zadar -->
+        <path d="M 90 80 L 60 40 L 160 240" fill="none" stroke="#3b82f6" stroke-width="3"/>
+        <!-- Day 3: Zadar -> Split -->
+        <path d="M 160 240 L 240 320" fill="none" stroke="#10b981" stroke-width="3"/>
+        <!-- Day 5: Split -> Ston -> Dubrovnik -->
+        <path d="M 240 320 L 340 400 L 390 430" fill="none" stroke="#f59e0b" stroke-width="3"/>
+
+        <!-- 节点标注 -->
+        <!-- 上海 / 北京 -->
+        <circle cx="430" cy="430" r="5" fill="#64748b"/>
+        <text x="435" y="445" font-size="10" fill="var(--text-muted)">上海 PVG</text>
+
+        <!-- ZAG -->
+        <circle cx="150" cy="90" r="6" fill="#ef4444"/>
+        <text x="160" y="90" font-size="11" font-weight="bold" fill="var(--text-main)">萨格勒布 ZAG (取车)</text>
+
+        <!-- Bled -->
+        <circle cx="60" cy="40" r="5" fill="#3b82f6"/>
+        <text x="15" y="35" font-size="10" fill="var(--text-main)">布莱德湖 Bled</text>
+
+        <!-- Ljubljana -->
+        <circle cx="90" cy="80" r="7" fill="#ef4444"/>
+        <text x="20" y="95" font-size="11" font-weight="bold" fill="var(--text-main)">宿: 卢布尔雅那 🏠</text>
+
+        <!-- Zadar -->
+        <circle cx="160" cy="240" r="7" fill="#3b82f6"/>
+        <text x="90" y="245" font-size="11" font-weight="bold" fill="var(--text-main)">宿: 扎达尔 🏠</text>
+
+        <!-- Split -->
+        <circle cx="240" cy="320" r="7" fill="#10b981"/>
+        <text x="170" y="335" font-size="11" font-weight="bold" fill="var(--text-main)">宿: 斯普利特 🏠</text>
+
+        <!-- Ston -->
+        <circle cx="340" cy="400" r="4" fill="#f59e0b"/>
+        <text x="290" y="415" font-size="10" fill="var(--text-muted)">斯通 Ston (生蚝)</text>
+
+        <!-- Dubrovnik -->
+        <circle cx="390" cy="430" r="7" fill="#8b5cf6"/>
+        <text x="310" y="450" font-size="11" font-weight="bold" fill="var(--text-main)">宿: 杜布罗夫尼克 🏠</text>
+      </svg>
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div>Day 1 扎格勒布-卢布尔雅那</div>
+        <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div>Day 2 布莱德湖-扎达尔</div>
+        <div class="legend-item"><div class="legend-color" style="background:#10b981"></div>Day 3-4 斯普利特/跳岛</div>
+        <div class="legend-item"><div class="legend-color" style="background:#8b5cf6"></div>Day 5-7 杜布罗夫尼克</div>
+      </div>
     </div>
 
-    <!-- 行程卡片区域 -->
-    
+    <!-- 3. 已确认订票与预订卡片 -->
+    <div class="section-title">🎫 已确认预订 & 住宿预订</div>
+    <div class="booking-grid">
+      <!-- 租车信息 -->
+      <div class="booking-card">
+        <div class="booking-header">
+          <span class="booking-title">🚗 租车（萨格勒布取车 -> 杜布罗夫尼克还车）</span>
+          <span class="booking-tag">自驾预订</span>
+        </div>
+        <div class="booking-detail">📍 **取车**：10/2 10:30 @ 萨格勒布机场 (ZAG) T1 租车柜台</div>
+        <div class="booking-detail">📍 **还车**：10/6 15:00 @ 杜布罗夫尼克老城附近/市区还车点</div>
+        <div class="booking-detail">📞 **注意事项**：跨国（克罗地亚-斯洛文尼亚）需确认含 Cross Border 许可与斯洛文尼亚高速公路绿卡/Vignette。</div>
+      </div>
+
+      <!-- 住宿列表 -->
+      <div class="booking-card">
+        <div class="booking-header">
+          <span class="booking-title">🏨 Day 1 住宿: 卢布尔雅那公寓</span>
+          <span class="booking-tag">斯洛文尼亚</span>
+        </div>
+        <div class="booking-detail">📍 Podmilščakova ulica 51, 1000 Ljubljana, Slovenia</div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Podmil%C5%A1%C4%8Dakova+ulica+51+1000+Ljubljana" target="_blank">🗺️ 打开 Google 地图导航</a>
+      </div>
+
+      <div class="booking-card">
+        <div class="booking-header">
+          <span class="booking-title">🏨 Day 2 住宿: 扎达尔海景公寓</span>
+          <span class="booking-tag">扎达尔</span>
+        </div>
+        <div class="booking-detail">📍 Obala kneza Branimira 14 building, Zadar, 23000, Croatia</div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Obala+kneza+Branimira+14+Zadar" target="_blank">🗺️ 打开 Google 地图导航</a>
+      </div>
+
+      <div class="booking-card">
+        <div class="booking-header">
+          <span class="booking-title">🏨 Day 3 & 4 住宿: 斯普利特市中心公寓</span>
+          <span class="booking-tag">连住 2 晚</span>
+        </div>
+        <div class="booking-detail">📍 Ulica kralja Zvonimira 91, Split, 21000, Croatia</div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Ulica+kralja+Zvonimira+91+Split" target="_blank">🗺️ 打开 Google 地图导航</a>
+      </div>
+
+      <div class="booking-card">
+        <div class="booking-header">
+          <span class="booking-title">🏨 Day 5 & 6 住宿: 喜来登酒店</span>
+          <span class="booking-tag">Sheraton Riviera</span>
+        </div>
+        <div class="booking-detail">📍 Šetalište Dr. F. Tuđmana 17, 20207, Srebreno, Croatia</div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=%C5%A0etali%C5%A1te+Dr.+F.+Tu%C4%9Fmana+17+20207+Srebreno" target="_blank">🗺️ 打开 Google 地图导航</a>
+      </div>
+
+      <div class="booking-card">
+        <div class="booking-header">
+          <span class="booking-title">🏨 Day 7 住宿: Zvekovica Airbnb (近机场)</span>
+          <span class="booking-tag">离境前夜休整</span>
+        </div>
+        <div class="booking-detail">📍 Odvojak 2 11, Zvekovica, Dubrovnik-Neretva County 20210, Croatia</div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Odvojak+2+11+Zvekovica" target="_blank">🗺️ 打开 Google 地图导航</a>
+      </div>
+    </div>
+
+    <!-- 4. 逐日行程卡片 -->
+    <div class="section-title">📅 逐日详细行程</div>
+
     <!-- Day 0 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 0 (10/1) 启程启航</span>
-            <span class="day-location">飞行中</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 0 · 10/1 (周四)</span>
+          <div class="day-title">上海 ✈ 北京 (转机启程)</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                18:50 上海浦东 T2 ✈ CA1836 ✈ 21:25 北京首都 T3
-            </div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">18:50 - 21:25</div>
+          <div class="timeline-content">✈️ <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Shanghai+Pudong+International+Airport+Terminal+2" target="_blank">上海浦东 T2</a> 起飞前往北京首都 T3 (转机)</div>
         </div>
+      </div>
     </div>
 
     <!-- Day 1 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 1 (10/2) 萨格勒布 → 卢布尔雅那</span>
-            <span class="day-location">Ljubljana</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 1 · 10/2 (周五)</span>
+          <div class="day-title">北京 ✈ 萨格勒布 → 自驾前往卢布尔雅那</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                09:55 抵达萨格勒布机场取车 → 萨格勒布老城漫步 → 自驾过境至斯洛文尼亚 → 卢布尔雅那老城游览
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">🏛️ Zagreb 推荐打卡点：</span>
-                圣马可教堂 → 警示塔 → Funicular缆车 → 石门 → KRAVATA领带店 → Dolac Market → 札格瑞布大教堂 → 耶拉西奇广场 → 歌剧院
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">📷 卢布尔雅那主要景点：</span>
-                卢布尔雅那城堡 → 普列舍伦广场 → 三重桥 → Cobblers' Bridge → 飞龙桥 → 中央农贸市场 → 市政厅 → 蒂沃利公园
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">🍽️ 推荐餐厅合集：</span>
-                <a href="https://maps.app.goo.gl/pY7GcyB6QfbDZ7dr9" target="_blank" class="link-tag">🍴 谷歌地图美食品鉴清单 (Google Maps)</a>
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">🚘 租车与取车信息：</span>
-                <div class="placeholder-box">
-                    租车公司：[待补充，例如 Hertz / SIXT]<br>
-                    订单编号：[待补充]<br>
-                    取车地点：萨格勒布机场 (ZAG) 柜台<br>
-                    注意事项：确认跨国通行费/过境卡 (Cross-Border Card)
-                </div>
-            </div>
-
-            <div class="info-group">
-                <span class="info-label">🏨 住宿与定位：</span>
-                <a href="https://maps.app.goo.gl/9Fc8XqNLQPHRuhmMA" target="_blank" class="link-tag">📍 卢布尔雅那住宿 (Google Maps)</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🔗 相关工具/购票：</span>
-                <a href="https://evinjeta.dars.si/" target="_blank" class="link-tag">🎫 购买斯洛文尼亚 e-Vignette 高速票</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🌦 当地与实况天气：</span>
-                <a href="https://www.accuweather.com/en/search-locations" target="_blank" class="link-tag">📍 当前 IP 位置实况天气</a>
-                <a href="https://www.accuweather.com/en/si/ljubljana/300152/weather-forecast/300152" target="_blank" class="link-tag">🌦 卢布尔雅那天气</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/dir/?api=1&origin=Zagreb+Airport&destination=Podmil%C5%A1%C4%8Dakova+ulica+51+Ljubljana&waypoints=Zagreb+City+Center" target="_blank">🧭 一键开启今日多点导航</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">00:30 - 09:55</div>
+          <div class="timeline-content">✈️ 北京首都 T3 飞抵 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Franjo+Tu%C4%9Fman+Airport+Zagreb" target="_blank">萨格勒布 T1</a>，办理入境与提取行李</div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10:30</div>
+          <div class="timeline-content">🚗 萨格勒布机场办理取车手续（检查电子高速贴纸/Vignette）</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">11:30 - 14:00</div>
+          <div class="timeline-content">🏛️ <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Ban+Jela%C4%8Di%C4%87+Square+Zagreb" target="_blank">萨格勒布老城漫步</a>，耶拉契奇总督广场、圣马克教堂</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">14:30 - 16:30</div>
+          <div class="timeline-content">🛣️ 自驾前往卢布尔雅那 (车程约 2 小时，入境斯洛文尼亚)</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">17:00 - 20:00</div>
+          <div class="timeline-content">🏰 游览 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Ljubljana+Triple+Bridge" target="_blank">卢布尔雅那三重桥</a> & 龙桥，老城晚餐并入住公寓</div>
+        </div>
+      </div>
     </div>
 
     <!-- Day 2 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 2 (10/3) 布莱德湖 → 扎达尔</span>
-            <span class="day-location">Zadar</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 2 · 10/3 (周六)</span>
+          <div class="day-title">卢布尔雅那 → 布莱德湖 (仙境游) → 扎达尔海风琴日落</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                驱车至布莱德湖 → 南下经过十六湖外围 → 抵达扎达尔看海风琴 &“向太阳致敬”日落
-            </div>
-            <div class="info-group">
-                <span class="info-label">🏨 住宿与定位：</span>
-                <a href="https://www.google.com/maps/search/?api=1&query=Falkensteiner+Hotel+Adriana+Zadar" target="_blank" class="link-tag">📍 扎达尔 Falkensteiner Hotel Adriana (Google Maps)</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🔗 景点官网/门票：</span>
-                <a href="https://www.blejski-grad.si/en/" target="_blank" class="link-tag">🏰 布莱德城堡官网</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🌦 当地天气：</span>
-                <a href="https://www.accuweather.com/en/si/bled/300127/weather-forecast/300127" target="_blank" class="link-tag">查 布莱德湖 天气</a>
-                <a href="https://www.accuweather.com/en/hr/zadar/118878/weather-forecast/118878" target="_blank" class="link-tag">查 扎达尔 天气</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/dir/?api=1&origin=Podmil%C5%A1%C4%8Dakova+ulica+51+Ljubljana&destination=Obala+kneza+Branimira+14+Zadar&waypoints=Lake+Bled%7COsojnica+Trailhead%7CSea+Organ+Zadar" target="_blank">🧭 一键开启今日多点导航</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">08:30 - 09:30</div>
+          <div class="timeline-content">🛣️ 自驾至 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Lake+Bled+Slovenia" target="_blank">布莱德湖 Lake Bled</a> (车程约 50 分钟)</div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">09:30 - 13:30</div>
+          <div class="timeline-content">⛰️ 登 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Osojnica+Bled+Viewpoint" target="_blank">Osojnica 观景台</a> 拍湖景全景 -> 湖边划船 -> 参观布莱德城堡</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">13:30 - 17:30</div>
+          <div class="timeline-content">🛣️ 直走高速公路自驾前往扎达尔 (车程约 4 小时，跳过十六湖外围)</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">18:00 - 19:30</div>
+          <div class="timeline-content">🌅 欣赏 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Sea+Organ+Zadar" target="_blank">扎达尔海风琴 Sea Organ</a> 亚得里亚海绝美日落 (日落约 18:15)</div>
+        </div>
+      </div>
     </div>
 
     <!-- Day 3 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 3 (10/4) 扎达尔 → 斯普利特</span>
-            <span class="day-location">Split</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 3 · 10/4 (周日)</span>
+          <div class="day-title">扎达尔老城 → D8 沿海公路自驾 → 斯普利特</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                上午游览扎达尔老城 → 下午沿景观 D8 公路前往斯普利特 → 傍晚漫步戴克里先宫
-            </div>
-            <div class="info-group">
-                <span class="info-label">🏨 住宿与定位：</span>
-                <a href="https://www.google.com/maps/search/?api=1&query=Split+Croatia" target="_blank" class="link-tag">📍 斯普利特地图 (Google Maps)</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🌦 当地天气：</span>
-                <a href="https://www.accuweather.com/en/hr/split/118330/weather-forecast/118330" target="_blank" class="link-tag">查 斯普利特 天气</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/dir/?api=1&origin=Obala+kneza+Branimira+14+Zadar&destination=Ulica+kralja+Zvonimira+91+Split&waypoints=Zadar+Old+Town%7CDiocletian's+Palace+Split" target="_blank">🧭 一键开启今日多点导航</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">09:00 - 11:30</div>
+          <div class="timeline-content">🏛️ 漫步 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Church+of+St.+Donatus+Zadar" target="_blank">扎达尔老城</a>，圣多纳图斯教堂与罗马广场</div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">12:00 - 15:30</div>
+          <div class="timeline-content">🌊 体验克罗地亚最美风景公路 **D8 海岸公路** 驶往斯普利特</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">16:00 - 20:00</div>
+          <div class="timeline-content">🏰 参观 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Diocletian's+Palace+Split" target="_blank">戴克里先宫 Diocletian Palace</a> 夕阳与古城巷弄夜景</div>
+        </div>
+      </div>
     </div>
 
     <!-- Day 4 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 4 (10/5) 蓝洞 & 5 岛出海一日游</span>
-            <span class="day-location">Split</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 4 · 10/5 (周一)</span>
+          <div class="day-title">斯普利特出海 · 蓝洞及五岛跳岛一日游</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                全天快艇出海：毕舍沃岛 → 维斯岛 → 斯蒂尼瓦海湾 → 赫瓦尔镇
-            </div>
-            <div class="info-group">
-                <span class="info-label">🔗 预订平台链接：</span>
-                <a href="https://www.getyourguide.com/split-l268/split-full-day-speedboat-tour-to-5-islands-blue-cave-t68783/" target="_blank" class="link-tag">🚤 GetYourGuide 蓝洞 5 岛预订</a>
-                <a href="https://www.viator.com/Split-tours/Port-Transfers/d4185-g15-c52" target="_blank" class="link-tag">⛵ Viator 跳岛预订</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🌦 当地天气：</span>
-                <a href="https://www.accuweather.com/en/hr/hvar/116262/weather-forecast/116262" target="_blank" class="link-tag">查 赫瓦尔岛 天气</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/search/?api=1&query=Port+of+Split" target="_blank">🧭 一键开启出海码头导航</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">07:30 - 18:30</div>
+          <div class="timeline-content">⛵ 全天出海游览 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Blue+Cave+Bi%C5%A1evo" target="_blank">比舍沃岛蓝洞 Blue Cave</a> <span class="badge-booking-required">需提前订包船/一日游</span>、维斯岛 Vis、赫瓦尔镇 Hvar</div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">19:00 - 21:00</div>
+          <div class="timeline-content">🍷 返回斯普利特港口，享用海鲜晚餐</div>
+        </div>
+      </div>
     </div>
 
     <!-- Day 5 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 5 (10/6) 斯普利特 → 斯通 → 杜布罗夫尼克</span>
-            <span class="day-location">Dubrovnik</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 5 · 10/6 (周二)</span>
+          <div class="day-title">斯通 (品尝生蚝) → 还车 → 杜布罗夫尼克日落皮划艇</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                沿 D8 海岸公路自驾 → 途经小镇斯通品尝生蚝 → 抵达杜布罗夫尼克机场还车 → 傍晚海边日落皮划艇
-            </div>
-            <div class="info-group">
-                <span class="info-label">🏨 住宿与定位：</span>
-                <a href="https://www.google.com/maps/search/?api=1&query=Dubrovnik+Croatia" target="_blank" class="link-tag">📍 杜布罗夫尼克地图 (Google Maps)</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🌦 当地天气：</span>
-                <a href="https://www.accuweather.com/en/hr/dubrovnik/117910/weather-forecast/117910" target="_blank" class="link-tag">查 杜布罗夫尼克 天气</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/dir/?api=1&origin=Ulica+kralja+Zvonimira+91+Split&destination=Pile+Gate+Dubrovnik&waypoints=Ston+Croatia%7CSheraton+Dubrovnik+Riviera+Hotel" target="_blank">🧭 一键开启今日多点导航</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">09:00 - 11:30</div>
+          <div class="timeline-content">🛣️ 沿 D8 公路驱车前往 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Ston+Croatia" target="_blank">斯通 Ston</a></div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">11:30 - 13:30</div>
+          <div class="timeline-content">🦪 斯通古城墙漫步 & 现场品尝亚得里亚海顶级新鲜生蚝</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">14:30 - 15:30</div>
+          <div class="timeline-content">🏨 抵达 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Sheraton+Dubrovnik+Riviera+Hotel" target="_blank">Sheraton Dubrovnik</a> 卸行李，并在老城附近/市区还车 🚗</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">16:30 - 19:00</div>
+          <div class="timeline-content">🚣‍♂️ <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Pile+Gate+Dubrovnik" target="_blank">Pile Gate 集合</a> 参加杜布罗夫尼克日落皮划艇 <span class="badge-booking-required">需提前预约</span></div>
+        </div>
+      </div>
     </div>
 
     <!-- Day 6 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 6 (10/7) 杜布罗夫尼克古城深度游</span>
-            <span class="day-location">Dubrovnik</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 6 · 10/7 (周三)</span>
+          <div class="day-title">杜布罗夫尼克古城墙 & 权游打卡 → 缆车登顶 Srd 山</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                网红 Brunch → 游览中世纪古城墙 & 打卡点 → 乘坐缆车/空中脚踏车登顶 Srd 山俯瞰全景
-            </div>
-            <div class="info-group">
-                <span class="info-label">🔗 门票与体验预订：</span>
-                <a href="https://www.dubrovnikcablecar.com/" target="_blank" class="link-tag">🚡 杜布罗夫尼克缆车官网</a>
-                <a href="https://www.getyourguide.com/dubrovnik-l913/dubrovnik-city-walls-tour-t402837/" target="_blank" class="link-tag">🏰 城墙门票/讲解预订</a>
-            </div>
-            <div class="info-group">
-                <span class="info-label">🌦 当地天气：</span>
-                <a href="https://www.accuweather.com/en/hr/dubrovnik/117910/weather-forecast/117910" target="_blank" class="link-tag">查 杜布罗夫尼克 天气</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/dir/?api=1&origin=Sheraton+Dubrovnik+Riviera+Hotel&destination=Dubrovnik+Cable+Car&waypoints=Dubrovnik+City+Walls" target="_blank">🧭 一键开启今日多点导航</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10:00 - 12:00</div>
+          <div class="timeline-content">🍳 老城网红餐厅 Brunch</div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">12:30 - 15:30</div>
+          <div class="timeline-content">🏰 登 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Dubrovnik+City+Walls" target="_blank">杜布罗夫尼克古城墙</a> 俯瞰全城与权游打卡 (建议买 Dubrovnik Pass)</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">16:30 - 18:30</div>
+          <div class="timeline-content">🚡 乘坐 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Dubrovnik+Cable+Car" target="_blank">杜布罗夫尼克缆车</a> 登上 Srd 山顶俯瞰日落绝景</div>
+        </div>
+      </div>
     </div>
 
     <!-- Day 7 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 7 (10/8) 杜城休闲与整理</span>
-            <span class="day-location">Dubrovnik</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 7 · 10/8 (周四)</span>
+          <div class="day-title">老城深度漫步 → 海边咖啡休整 → 移宿机场附近</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 核心行程：</span>
-                老城巷子深度漫步、挑选纪念品、海边咖啡厅放松。提前收拾行李早点休息，为次日 06:15 航班做准备。
-            </div>
-            <div class="info-group">
-                <span class="info-label">⚠️ 选座提醒：</span>
-                <a href="https://www.croatiaairlines.com/check-in" target="_blank" class="link-tag">✈️ 记得提前48小时完成 OU661 网页值机/选座</a>
-            </div>
+      </div>
+      <a class="btn-nav-all" href="https://www.google.com/maps/dir/?api=1&origin=Sheraton+Dubrovnik+Riviera+Hotel&destination=Odvojak+2+11+Zvekovica" target="_blank">🧭 一键开启今日路线</a>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10:00 - 15:00</div>
+          <div class="timeline-content">☕ 老城深度巷弄游览、挑选纪念品、海边悬崖咖啡馆 (Buža Bar) 惬意下午茶</div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">17:00</div>
+          <div class="timeline-content">🧳 打车打包行李前往 Zvekovica Airbnb (离机场仅 5 分钟车程)，提前预约明晨 04:30 Uber 🚖</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Day 8 & 9 -->
+    <!-- Day 8 & Day 9 -->
     <div class="day-card">
-        <div class="day-header" onclick="toggleCard(this)">
-            <span class="day-title">Day 8-9 (10/9-10/10) 返程上海</span>
-            <span class="day-location">返程</span>
-            <span class="toggle-icon">▼</span>
+      <div class="day-header">
+        <div>
+          <span class="day-badge">DAY 8-9 · 10/9 - 10/10</span>
+          <div class="day-title">杜布罗夫尼克 ✈ 萨格勒布 ✈ 北京 ✈ 上海 (返程)</div>
         </div>
-        <div class="day-body">
-            <div class="info-group">
-                <span class="info-label">📌 航班衔接：</span>
-                · 10/9 06:15–07:10: 杜城 ✈ OU661 ✈ 萨格勒布<br>
-                · 10/9 11:55: 萨格勒布 T1 ✈ CA914 ✈ 北京首都<br>
-                · 10/10 10:30–12:40: 北京首都 ✈ CA1531 ✈ 上海虹桥 T2
-            </div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10/9 04:30</div>
+          <div class="timeline-content">🚖 Uber 前往 <a class="location-btn" href="https://www.google.com/maps/search/?api=1&query=Dubrovnik+Airport" target="_blank">杜布罗夫尼克机场 (DBV)</a></div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10/9 06:15 - 07:10</div>
+          <div class="timeline-content">✈️ 杜布罗夫尼克 飞往 萨格勒布 (转机)</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10/9 11:55 - 10/10 08:05</div>
+          <div class="timeline-content">✈️ 萨格勒布 飞往 北京首都 T3</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">10/10 10:30 - 12:40</div>
+          <div class="timeline-content">✈️ 北京首都 T3 飞抵 上海虹桥 T2，顺利回到温馨的家！</div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        function toggleCard(headerElement) {
-            const card = headerElement.parentElement;
-            card.classList.toggle('open');
+    <!-- 5. 待办清单 (纯列表) -->
+    <div class="section-title">📋 出发前待办事项 (纯列表)</div>
+    <div class="todo-card">
+      <ul class="todo-list">
+        <li class="todo-item"><div class="todo-bullet"></div>办理申根多次签证 (Schengen Multiple Entry Visa)</li>
+        <li class="todo-item"><div class="todo-bullet"></div>办理驾照翻译件 / 国际驾照认证件 (IDP/Translation)</li>
+        <li class="todo-item"><div class="todo-bullet"></div>购买含紧急医疗与自驾险的境外旅游保险</li>
+        <li class="todo-item"><div class="todo-bullet"></div>租车订单确认并购买斯洛文尼亚高速公路电子贴纸 (Vignette)</li>
+        <li class="todo-item"><div class="todo-bullet"></div>提前预约 Split 蓝洞及五岛跳岛一日游</li>
+        <li class="todo-item"><div class="todo-bullet"></div>提前预约杜布罗夫尼克日落皮划艇 (Sunset Kayak)</li>
+        <li class="todo-item"><div class="todo-bullet"></div>购买 10/9 清晨前往杜布罗夫尼克机场的 Uber 或出租车预约</li>
+        <li class="todo-item"><div class="todo-bullet"></div>开通手机国际漫游或购买欧洲多国通用 eSIM / SIM 卡</li>
+      </ul>
+    </div>
+
+    <!-- 6. 实用贴士 -->
+    <div class="section-title">💡 实用贴士 & 自驾避坑</div>
+    <div class="tip-card">
+      <div class="tip-title">💶 货币与支付</div>
+      <div class="tip-desc">克罗地亚与斯洛文尼亚均使用 **欧元 (€ / EUR)**。绝大多数超市、餐厅、加油站均支持 Visa / MasterCard 刷卡，建议准备少量现金（100-200欧元）用于小摊位或小额停车费。</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">🚗 高速通行与跨境许可 (Vignette)</div>
+      <div class="tip-desc">进入斯洛文尼亚高速必须购买电子 Vignette（可在边界加油站或官网提前购买）。克罗地亚高速则为按段收费（进站取卡，出站刷卡/付现）。</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">🅿️ 杜布罗夫尼克停车风险</div>
+      <div class="tip-desc">杜布罗夫尼克老城完全禁车，老城外 Zone 1 停车费极其昂贵（€10+/小时）。因此在 Day 5 下午先在市区还车是最佳避坑方案！</div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-title">📞 紧急求助电话</div>
+      <div class="tip-desc">欧洲统一通用求助/急救电话：**112**。中国驻克罗地亚大使馆领事保护电话：+385-1-4693000。</div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript: 动态带时区倒计时与「此刻关注」自动切换 -->
+  <script>
+    (function() {
+      // 定义关键节点（ISO 标准时间带时区）
+      var events = [
+        { name: "上海浦东起飞 (Day 0 ✈️)", time: "2026-10-01T18:50:00+08:00" },
+        { name: "北京飞抵萨格勒布 (Day 1 🛬)", time: "2026-10-02T09:55:00+02:00" },
+        { name: "萨格勒布机场取车 (Day 1 🚗)", time: "2026-10-02T10:30:00+02:00" },
+        { name: "扎达尔海风琴观赏日落 (Day 2 🌅)", time: "2026-10-03T18:15:00+02:00" },
+        { name: "斯普利特出海蓝洞一日游 (Day 4 ⛵)", time: "2026-10-05T07:30:00+02:00" },
+        { name: "杜布罗夫尼克还车 & 日落皮划艇 (Day 5 🚣‍♂️)", time: "2026-10-06T15:00:00+02:00" },
+        { name: "杜布罗夫尼克登顶 Srd 山 (Day 6 🚡)", time: "2026-10-07T16:30:00+02:00" },
+        { name: "杜布罗夫尼克起飞返程 (Day 8 ✈️)", time: "2026-10-09T06:15:00+02:00" },
+        { name: "顺利飞抵上海 (Day 9 🏡)", time: "2026-10-10T12:40:00+08:00" }
+      ];
+
+      function updateCountdown() {
+        var now = new Date().getTime();
+        var targetEvent = null;
+
+        for (var i = 0; i < events.length; i++) {
+          var evTime = new Date(events[i].time).getTime();
+          if (evTime > now) {
+            targetEvent = events[i];
+            break;
+          }
         }
 
-        function toggleAll(open) {
-            const cards = document.querySelectorAll('.day-card');
-            cards.forEach(card => {
-                if (open) {
-                    card.classList.add('open');
-                } else {
-                    card.classList.remove('open');
-                }
-            });
+        if (!targetEvent) {
+          document.getElementById('hero-event').textContent = "旅程已圆满结束 🎉";
+          document.getElementById('cd-days').textContent = "00";
+          document.getElementById('cd-hours').textContent = "00";
+          document.getElementById('cd-mins').textContent = "00";
+          document.getElementById('cd-secs').textContent = "00";
+          return;
         }
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.day-card')[1].classList.add('open');
-        });
-    </script>
+
+        document.getElementById('hero-event').textContent = targetEvent.name;
+
+        var targetTime = new Date(targetEvent.time).getTime();
+        var diff = targetTime - now;
+
+        var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        var secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('cd-days').textContent = days < 10 ? '0' + days : days;
+        document.getElementById('cd-hours').textContent = hours < 10 ? '0' + hours : hours;
+        document.getElementById('cd-mins').textContent = mins < 10 ? '0' + mins : mins;
+        document.getElementById('cd-secs').textContent = secs < 10 ? '0' + secs : secs;
+      }
+
+      setInterval(updateCountdown, 1000);
+      updateCountdown();
+    })();
+  </script>
 </body>
 </html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("HTML file generated successfully as index.html")
